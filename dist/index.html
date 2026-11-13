@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>U.S. Urban Heat Atlas</title><meta name="description" content="Explore how typical urban air temperatures compare with nearby rural stations across the United States.">
+<link rel="stylesheet" href="style.css">
+<script defer src="d3-array.min.js"></script><script defer src="d3-geo.min.js"></script><script defer src="topojson-client.min.js"></script><script defer src="app.js"></script></head>
+<body>
+<header class="top"><div class="wrap top-inner"><a class="brand" href="#">◉ <span>Urban Heat Atlas</span></a><nav><a href="#rankings">Rankings</a><a href="#method">Methodology</a></nav></div></header>
+<main class="wrap">
+<section class="intro"><div class="kicker">U.S. CLIMATE NORMALS <span>1991–2020</span></div><h1>How much warmer<br>is <em>the city?</em></h1><p>Compare typical air temperatures in U.S. urban areas with nearby rural stations.</p></section>
+<section aria-label="Explore urban heat" id="explore">
+<div class="toolbar">
+<label class="search">Find an urban area<input type="search" id="search" placeholder="Search Denton, Chicago, Honolulu…"></label>
+<label>Season<select id="period"><option value="ann">Annual</option><option value="jja">Summer (Jun–Aug)</option><option value="djf">Winter (Dec–Feb)</option></select></label>
+<label>Temperature unit<select id="unit"><option value="F">°F Fahrenheit</option><option value="C">°C Celsius</option></select></label>
+</div>
+<p id="status" role="status">Loading station comparisons…</p>
+<div class="dashboard">
+<section class="card map-card"><div class="card-head"><div><h2>National map</h2><p>Choose an area to see its temperature difference.</p></div></div><svg id="map" viewBox="0 0 900 510" aria-label="Map of urban and rural temperature differences"></svg>
+<div class="legend"><span><i class="cool"></i> Urban cooler</span><span><i class="neutral"></i> Near zero</span><span><i class="warm"></i> Urban warmer</span></div></section>
+<section class="card detail" id="detail" aria-live="polite"><p class="kicker">SELECTED URBAN AREA</p><h2 id="area">—</h2><div id="delta" class="delta">—</div><p id="interpretation"></p><div class="temps"><div><span>Urban air</span><strong id="urban">—</strong></div><div><span>Rural air</span><strong id="rural">—</strong></div></div><p id="stations"></p><details><summary>View NOAA station IDs</summary><p id="stationIds"></p></details></section>
+</div></section>
+<section id="rankings" class="card rankings"><div class="card-head"><div><h2>Compare urban areas</h2><p>Click a column heading to sort.</p></div><button id="export" disabled>Download results CSV ↓</button></div>
+<div class="table-scroll"><table><thead><tr><th data-key="area"><button>Urban area</button></th><th data-key="urban"><button>Urban air</button></th><th data-key="rural"><button>Rural air</button></th><th data-key="delta" aria-sort="descending"><button>Urban − rural</button></th><th data-key="stations"><button>Urban stations</button></th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="pagination"><span id="pageText"></span><div><button id="prev">Previous</button> <button id="next">Next</button></div></div>
+</section>
+<section class="method" id="method"><div><p class="kicker">ABOUT THE DATA</p><h2>How the comparison works</h2></div><div>
+<p><strong>Heat island estimate = urban mean air temperature − rural reference mean air temperature.</strong> Positive values indicate warmer urban air. The map shows 30-year weather-station normals.</p>
+<p>Station locations are classified using 2020 Census urban boundaries. Each urban station is matched to its two or three nearest stations outside all urban areas, 5–80 km away and within 150 m of elevation. Each station needs at least 24 contributing years for annual, summer, and winter averages. The urban result averages the matched urban stations. The rural result averages their rural reference means, giving each urban station equal weight.</p>
+<p>Coverage includes areas in the 50 states and D.C. with qualifying matches. An area can have just one urban station. Terrain, coastal effects, and station siting can also affect the temperature gap. Station positions on the map represent the first matched urban station in each area.</p>
+<p class="sources"><a href="https://www.ncei.noaa.gov/access/search/data-search/normals-annualseasonal-1991-2020/">NOAA Climate Normals ↗</a> <a href="https://www.census.gov/geographies/mapping-files/2020/geo/carto-boundary-file.html">Census boundaries ↗</a> <a href="https://www.ncei.noaa.gov/data/normals-annualseasonal/1991-2020/archive/">Original NOAA CSV archive ↗</a> <a href="urban-rural-normals.csv" download>Full comparison CSV ↓</a></p>
+</div></section>
+</main><footer class="wrap">U.S. Urban Heat Atlas · NOAA NCEI and U.S. Census Bureau</footer></body></html>
