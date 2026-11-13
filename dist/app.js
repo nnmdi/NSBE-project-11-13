@@ -2,6 +2,7 @@ const $ = id => document.getElementById(id);
 const model = {areas: [], selected: null, page: 0, key: 'delta', direction: -1};
 const pageSize = 12;
 const number = value => value.toFixed(1).replace('-0.0', '0.0');
+const displayArea = name => name.replaceAll('--', '–');
 const unit = () => $('unit').value;
 const temp = value => number(unit() === 'C' ? (value - 32) / 1.8 : value) + ' °' + unit();
 const delta = value => {
@@ -17,7 +18,7 @@ function parseCsv(text) {
   );
 }
 function currentRows() {
-  const query = $('search').value.toLowerCase().trim();
+  const query = $('search').value.toLowerCase().trim().replace(/[–—]/g, '--');
   const period = $('period').value;
   return model.areas.filter(area => area.area.toLowerCase().includes(query)).map(area => {
     const urban = Number(area[period + '_urban_f']);
@@ -43,14 +44,40 @@ function selectArea(id, scroll = false) {
   render();
   if (scroll) $('detail').scrollIntoView({block: 'nearest', behavior: 'smooth'});
 }
+function renderSuggestions(rows) {
+  const container = $('suggestions');
+  container.replaceChildren();
+  const suggestions = $('search').value.trim()
+    ? rows.slice(0, 5)
+    : ['Denton--Lewisville', 'Chicago', 'Seattle--Tacoma', 'Anchorage', 'Honolulu']
+        .map(name => model.areas.find(area => area.area.startsWith(name + ',')))
+        .filter(Boolean);
+  if (!suggestions.length) return;
+  const label = document.createElement('span');
+  label.textContent = $('search').value.trim() ? 'Matches' : 'Try an area';
+  container.append(label);
+  for (const area of suggestions) {
+    const button = document.createElement('button');
+    button.textContent = displayArea(area.area);
+    button.addEventListener('click', () => {
+      $('search').value = displayArea(area.area);
+      model.page = 0;
+      selectArea(area.area_id);
+      $('search').focus();
+    });
+    container.append(button);
+  }
+}
+
 function render() {
   const rows = currentRows();
+  renderSuggestions(rows);
   const selected = rows.find(row => row.area_id === model.selected) ?? rows[0];
   if (selected) model.selected = selected.area_id;
   $('status').textContent = rows.length
     ? rows.length + ' of ' + model.areas.length + ' urban areas · ' + $('period').selectedOptions[0].textContent
-    : 'No qualifying urban areas match your search.';
-  $('area').textContent = selected?.area ?? 'No area selected';
+    : 'No matches in the reference CSV. Try a nearby area or clear your search.';
+  $('area').textContent = selected ? displayArea(selected.area) : 'No area selected';
   $('urban').textContent = selected ? temp(selected.urban) : '—';
   $('rural').textContent = selected ? temp(selected.rural) : '—';
   $('delta').textContent = selected ? delta(selected.delta) : '—';
@@ -103,7 +130,7 @@ function render() {
     const tr = table.insertRow();
     if (row === selected) tr.className = 'selected';
     const button = document.createElement('button');
-    button.textContent = row.area;
+    button.textContent = displayArea(row.area);
     button.setAttribute('aria-pressed', row === selected);
     button.addEventListener('click', () => selectArea(row.area_id, true));
     tr.insertCell().append(button);
@@ -161,6 +188,12 @@ async function start() {
   try {
     const [headers, ...rows] = parseCsv(await read('urban-rural-normals.csv', 'text'));
     model.areas = rows.map(row => Object.fromEntries(headers.map((key, index) => [key, row[index]])));
+    const options = model.areas.map(area => {
+      const option = document.createElement('option');
+      option.value = displayArea(area.area);
+      return option;
+    });
+    $('areaSuggestions').replaceChildren(...options);
     model.selected = model.areas.find(row => row.area.startsWith('Denton--Lewisville'))?.area_id;
     render();
   } catch (error) {
