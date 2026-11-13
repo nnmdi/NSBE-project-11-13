@@ -2,9 +2,9 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>U.S. Urban Heat Atlas</title><meta name="description" content="Explore how typical urban air temperatures compare with nearby rural stations across the United States.">
 <link rel="stylesheet" href="style.css">
-<script defer src="d3-array.min.js"></script><script defer src="d3-geo.min.js"></script><script defer src="topojson-client.min.js"></script><script defer src="app.js"></script></head>
+<script defer src="d3-array.min.js"></script><script defer src="d3-geo.min.js"></script><script defer src="topojson-client.min.js"></script><script defer src="shade.js"></script><script defer src="app.js"></script></head>
 <body>
-<header class="top"><div class="wrap top-inner"><a class="brand" href="#">◉ <span>Urban Heat Atlas</span></a><nav><a href="#rankings">Rankings</a><a href="#method">Methodology</a></nav></div></header>
+<header class="top"><div class="wrap top-inner"><a class="brand" href="#">◉ <span>Urban Heat Atlas</span></a><nav><a href="#planner">Shade planner</a><a href="#rankings">Rankings</a><a href="#method">Methodology</a></nav></div></header>
 <main class="wrap">
 <section class="intro"><div class="kicker">U.S. CLIMATE NORMALS <span>1991–2020</span></div><h1>How much warmer<br>is <em>the city?</em></h1><p>Compare typical air temperatures in U.S. urban areas with nearby rural stations.</p></section>
 <section aria-label="Explore urban heat" id="explore">
@@ -19,6 +19,23 @@
 <section class="card map-card"><div class="card-head"><div><h2>National map</h2><p>Choose an area to see its temperature difference.</p></div></div><svg id="map" viewBox="0 0 900 510" aria-label="Map of urban and rural temperature differences"></svg>
 <div class="legend"><span><i class="cool"></i> Urban cooler</span><span><i class="neutral"></i> Near zero</span><span><i class="warm"></i> Urban warmer</span></div></section>
 <section class="card detail" id="detail" aria-live="polite"><p class="kicker">SELECTED URBAN AREA</p><h2 id="area">—</h2><div id="delta" class="delta">—</div><p id="interpretation"></p><div class="temps"><div><span>Urban air</span><strong id="urban">—</strong></div><div><span>Rural air</span><strong id="rural">—</strong></div></div><p id="stations"></p><details><summary>View NOAA station IDs</summary><p id="stationIds"></p></details></section>
+</div></section>
+<section id="planner" class="card planner">
+<div class="planner-head"><p class="kicker">SHADE PLANNER</p><h2>Where should we add shade?</h2><p>Pick any area in the atlas CSV, then compare shade projects under a budget.</p></div>
+<div class="planner-body">
+<div class="planner-context"><label>Urban area<select id="plannerArea" disabled></select></label><p id="plannerClimate" aria-live="polite">Loading NOAA climate context…</p></div>
+<p class="scenario-note"><strong>Simulated estimates.</strong> The CSV supplies historical air temperatures. The candidate sites, costs, and foot traffic below are editable examples. The regression was trained on synthetic data, so its pavement cooling estimates need local field testing.</p>
+<form id="shadeForm">
+<div class="planner-controls">
+<label>Budget (USD)<input id="shadeBudget" type="number" min="0" max="100000000" step="1" value="12000" required></label>
+<label>Scenario air temperature (°F)<input id="scenarioAir" type="number" min="30" max="130" step="0.1" required></label>
+<button type="submit">Run shade planner</button>
+</div>
+<p class="scenario-help">The starting air temperature comes from the selected area's NOAA summer mean. Enter an observed afternoon temperature to test a specific day. Costs are in USD.</p>
+<div class="table-scroll"><table class="planner-table"><thead><tr><th scope="col">Example site</th><th scope="col">Surface</th><th scope="col">Current shade (%)</th><th scope="col">Proposed shade (%)</th><th scope="col">People/hour in new shade</th><th scope="col">Cost ($)</th></tr></thead><tbody id="shadeInputs"></tbody></table></div>
+</form>
+<div id="shadeResults" aria-live="polite"></div>
+<details class="planner-method"><summary>Model and ranking method</summary><p>A linear regression models pavement temperature from scenario air temperature, surface type, and shade. It estimates each site twice, using current and proposed shade. The planner chooses the combination that maximizes the sum of predicted pavement cooling × people per hour in newly shaded areas within the budget. The score ranks projects. The temperature estimate applies to pavement at each site.</p><p id="modelMetrics"></p></details>
 </div></section>
 <section id="rankings" class="card rankings"><div class="card-head"><div><h2>Compare urban areas</h2><p>Click a column heading to sort.</p></div><button id="export" disabled>Download results CSV ↓</button></div>
 <div class="table-scroll"><table><thead><tr><th data-key="area"><button>Urban area</button></th><th data-key="urban"><button>Urban air</button></th><th data-key="rural"><button>Rural air</button></th><th data-key="delta" aria-sort="descending"><button>Urban − rural</button></th><th data-key="stations"><button>Urban stations</button></th></tr></thead><tbody id="rows"></tbody></table></div>

@@ -42,6 +42,7 @@ $('map').append(markers);
 function selectArea(id, scroll = false) {
   model.selected = id;
   render();
+  window.shadePlanner.select(id);
   if (scroll) $('detail').scrollIntoView({block: 'nearest', behavior: 'smooth'});
 }
 function renderSuggestions(rows) {
@@ -148,6 +149,10 @@ for (const id of ['search','period','unit']) $(id).addEventListener(id === 'sear
   if (!model.areas.length) return;
   model.page = 0;
   render();
+  if (id === 'search' && $('search').value.trim()) {
+    const matches = currentRows();
+    if (matches.length === 1) window.shadePlanner.select(matches[0].area_id);
+  }
 });
 $('prev').addEventListener('click', () => {model.page--; render();});
 $('next').addEventListener('click', () => {model.page++; render();});
@@ -196,6 +201,7 @@ async function start() {
     $('areaSuggestions').replaceChildren(...options);
     model.selected = model.areas.find(row => row.area.startsWith('Denton--Lewisville'))?.area_id;
     render();
+    window.shadePlanner.start(model.areas, model.selected);
   } catch (error) {
     $('status').textContent = 'Station comparisons could not load. Refresh to try again.';
     console.error(error);
