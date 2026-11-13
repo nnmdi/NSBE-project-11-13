@@ -9,11 +9,11 @@
 <section class="intro"><div class="kicker">U.S. CLIMATE NORMALS <span>1991–2020</span></div><h1>How much warmer<br>is <em>the city?</em></h1><p>Compare typical air temperatures in U.S. urban areas with nearby rural stations.</p></section>
 <section aria-label="Explore urban heat" id="explore">
 <div class="toolbar">
-<label class="search">Find an urban area<input type="search" id="search" list="areaSuggestions" autocomplete="off" aria-describedby="searchHelp" placeholder="Search by urban area or state abbreviation…"><datalist id="areaSuggestions"></datalist></label>
+<label class="search">Find an urban area<select id="search" aria-describedby="searchHelp" disabled><option value="">All urban areas</option></select></label>
 <label>Season<select id="period"><option value="ann">Annual</option><option value="jja">Summer (Jun–Aug)</option><option value="djf">Winter (Dec–Feb)</option></select></label>
 <label>Temperature unit<select id="unit"><option value="F">°F Fahrenheit</option><option value="C">°C Celsius</option></select></label>
 </div>
-<div class="search-guide"><p id="searchHelp">Suggestions come from the <a href="urban-rural-normals.csv" download>reference CSV</a>. The file includes only urban areas with qualifying NOAA rural matches. An area missing from the file has no estimate in this app.</p><div class="suggestions" id="suggestions" aria-label="Suggested urban areas"></div></div>
+<div class="search-guide"><p id="searchHelp">All choices come from the <a href="urban-rural-normals.csv" download>reference CSV</a>. The file includes only urban areas with qualifying NOAA rural matches. An area missing from the file has no estimate in this app.</p><div class="suggestions" id="suggestions" aria-label="Suggested urban areas"></div></div>
 <p id="status" role="status">Loading station comparisons…</p>
 <div class="dashboard">
 <section class="card map-card"><div class="card-head"><div><h2>National map</h2><p>Choose an area to see its temperature difference.</p></div></div><svg id="map" viewBox="0 0 900 510" aria-label="Map of urban and rural temperature differences"></svg>
